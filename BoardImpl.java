@@ -1,4 +1,7 @@
-public class BoardImpl implements Board{
+/**
+ * An implementation of the board's methods.
+ */
+public class BoardImpl implements Board {
     private final Player[][] grid;
 
     public BoardImpl() {

@@ -1,3 +1,10 @@
+/**
+ * A Game of Connect 4 and its publicly available methods.
+ * 
+ * In the game, a client may access the current player, 
+ * game status, the board (readonly), and may 
+ * drop a checker or reset the board.
+ */
 public interface Game {
     /**
      * Get the current player available.
