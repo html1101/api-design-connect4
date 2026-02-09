@@ -1,23 +1,41 @@
+/**
+ * Sample code on how to interact with the Connect 4 API.
+ * 
+ * This is an example with two real game players,
+ * who make their moves in a CLI.
+ */
+
 import java.util.Scanner;
 
 public class TextClient {
 
     public static void main(String[] args) {
-        Game game = new GameImpl();
+        // Create a new game to start.
+        Game game = new Connect4();
+        
+        // Begin listening to STDIN for game input
         try (Scanner scanner = new Scanner(System.in)) {
+            // While the game is not finished:
             while (game.getGameStatus() == GameStatus.IN_PROGRESS) {
+                // Print out the board in ASCII
                 printBoard(game.getBoard());
                 
+                // Get whose turn it is, and ask them to choose a column to put their checker.
                 System.out.print(game.getCurrentPlayer() + " choose a column (0-6): ");
                 
+                // Get the column the player chooses
                 int column = scanner.nextInt();
                 
-                if (!game.makeMove(column)) {
+                // Drop a checker at that particular column.
+                if (!game.dropChecker(column)) {
+                    // If unable to drop that checker, print out an error and let them try again.
                     System.out.println("Invalid move. Try again.");
                 }
             }
             
+            // Print the board state out for the last time
             printBoard(game.getBoard());
+            // Say who won the game
             System.out.println("Game over: " + game.getGameStatus());
         }
     }
