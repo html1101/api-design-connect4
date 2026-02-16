@@ -1,3 +1,4 @@
+
 /**
  * Sample code on how to interact with the Connect 4 API.
  * 
@@ -11,32 +12,33 @@ public class TextClient {
 
     public static void main(String[] args) {
         // Create a new game to start.
-        Game game = new Connect4();
-        
+        Connect4 game = new Connect4Impl();
+
         // Begin listening to STDIN for game input
         try (Scanner scanner = new Scanner(System.in)) {
             // While the game is not finished:
             while (game.getGameStatus() == GameStatus.IN_PROGRESS) {
                 // Print out the board in ASCII
                 printBoard(game.getBoard());
-                
-                // Get whose turn it is, and ask them to choose a column to put their checker.
+
+                // Get whose turn it is, and ask them to choose a column to put their token.
                 System.out.print(game.getCurrentPlayer() + " choose a column (0-6): ");
-                
+
                 // Get the column the player chooses
                 int column = scanner.nextInt();
-                
-                // Drop a checker at that particular column.
-                if (!game.dropChecker(column)) {
-                    // If unable to drop that checker, print out an error and let them try again.
-                    System.out.println("Invalid move. Try again.");
+
+                // Drop a token at that particular column.
+                MoveResult tokenResult = game.dropToken(column);
+                if (!tokenResult.isSuccess()) {
+                    // If unable to drop that token, print out an error and let them try again.
+                    System.out.println("Supplied an invalid move! Error: " + tokenResult);
                 }
             }
-            
+
             // Print the board state out for the last time
             printBoard(game.getBoard());
             // Say who won the game
-            System.out.println("Game over: " + game.getGameStatus());
+            System.out.println("Game over: " + game.getGameStatus() + "!");
         }
     }
 
@@ -44,7 +46,7 @@ public class TextClient {
         for (int r = 0; r < board.getRows(); r++) {
             for (int c = 0; c < board.getColumns(); c++) {
                 Player p = board.getCell(r, c);
-                System.out.print(p == null ? ". " : (p == Player.RED ? "R " : "B "));
+                System.out.print(p == null ? ". " : (p == Player.PLAYER_1 ? "1 " : "2 "));
             }
             System.out.println();
         }

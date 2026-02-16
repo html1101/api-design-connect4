@@ -39,28 +39,32 @@ public class BoardImpl implements Board {
     }
 
     /**
-     * Drop a checker on the board from a given player.
+     * Drop a token on the board from a given player.
      * 
      * 
-     * @param column zero-indexed, the column to drop a checker down.
-     * @param player the player who is dropping the checker
+     * @param column zero-indexed, the column to drop a token down.
+     * @param player the player who is dropping the token
      * 
-     * @return -1 if columns are full or the inputted column is out of range.
+     * @return result of player trying to drop token (may or may not 
+     * succeed, see {@link MoveResult} and example on how to manage result).
      */
-    int dropChecker(int column, Player player) {
-        if (column < 0 || column >= COLUMNS || isColumnFull(column)) {
-            return -1;
+    MoveResult dropToken(int column, Player player) {
+        if (column < 0 || column >= COLUMNS) {
+            return MoveResult.invalidColumn();
+        }
+
+        if(isColumnFull(column)) {
+            return MoveResult.columnFull();
         }
 
         for (int row = ROWS - 1; row >= 0; row--) {
             if (grid[row][column] == null) {
                 grid[row][column] = player;
-                return row;
+                return MoveResult.successfulMove(row);
             }
         }
-        return -1;
+        return MoveResult.invalidColumn();
     }
-
 
     /**
      * Clear out the entire board.

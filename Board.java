@@ -35,7 +35,7 @@ public interface Board {
     /**
      * Return if a particular column in the board is full.
      * 
-     * @param row the (zero-indexed) index of the column.
+     * @param col the (zero-indexed) index of the column.
      * 
      * @return true if board column is full, false otherwise
      */
@@ -45,7 +45,7 @@ public interface Board {
      * Return if board is full and there are no more 
      * possible moves to make.
      * 
-     * @return true if board is full of checkers, false otherwise.
+     * @return true if board is full of tokens, false otherwise.
      */
     boolean isBoardFull();
 }

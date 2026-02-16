@@ -1,150 +1,59 @@
 /**
- * An API to handle the game logic of Connect 4.
+ * A Game of Connect 4 and its publicly available methods.
  * 
- * Connect 4 is a two-player game where each player tries to make a straight 
- * line (vertical, horizontal, or diagonal) of four of their colored checkers by 
- * dropping their checkers into a 6 x 7 grid. The two players take turns playing 
- * until one of them wins, or the board is full.
- * 
- * See <a href="https://youtu.be/ylZBRUJi3UQ?si=8IzWBx4_vP8jgVAX">this video</a> 
- * for a visual on how to play Connect 4.
- * 
- * The following is a simple example of how to create a basic ASCII 
- * two-player Connect 4 CLI using this API:
- * 
- * {@snippet :
-import java.util.Scanner;
-
-public class TextClient {
-
-    public static void main(String[] args) {
-        // Create a new game to start.
-        Game game = new Connect4();
-        
-        // Begin listening to STDIN for game input
-        try (Scanner scanner = new Scanner(System.in)) {
-            // While the game is not finished:
-            while (game.getGameStatus() == GameStatus.IN_PROGRESS) {
-                // Print out the board in ASCII
-                printBoard(game.getBoard());
-                
-                // Get whose turn it is, and ask them to choose a column to put their checker.
-                System.out.print(game.getCurrentPlayer() + " choose a column (0-6): ");
-                
-                // Get the column the player chooses
-                int column = scanner.nextInt();
-                
-                // Drop a checker at that particular column.
-                if (!game.dropChecker(column)) {
-                    // If unable to drop that checker, print out an error and let them try again.
-                    System.out.println("Invalid move. Try again.");
-                }
-            }
-            
-            // Print the board state out for the last time
-            printBoard(game.getBoard());
-            // Say who won the game
-            System.out.println("Game over: " + game.getGameStatus());
-        }
-    }
-
-    private static void printBoard(Board board) {
-        for (int r = 0; r < board.getRows(); r++) {
-            for (int c = 0; c < board.getColumns(); c++) {
-                Player p = board.getCell(r, c);
-                System.out.print(p == null ? ". " : (p == Player.RED ? "R " : "B "));
-            }
-            System.out.println();
-        }
-        System.out.println("0 1 2 3 4 5 6\n");
-    }
-}
- * }
+ * In the game, a client may access the current player,
+ * game status, the board (readonly), and may
+ * drop a token or reset the board.
  */
-public final class Connect4 implements Game {
-
-    private final BoardImpl board;
-    private Player currentPlayer;
-    private GameStatus status;
+public interface Connect4 {
+    /**
+     * Get the current player available.
+     * 
+     * @return the player whose current turn it is
+     */
+    Player getCurrentPlayer();
 
     /**
-     * Create a new, blank Connect 4 instance.
+     * Get the current game status.
      * 
-     * This will be a 6 x 7 grid that starts with the red player 
-     * playing first.
+     * @return game status (in progress, player A or B win, or draw)
      */
-    public Connect4() {
-        board = new BoardImpl();
-        reset();
-    }
+    GameStatus getGameStatus();
 
-    @Override
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
+    /**
+     * Get the game board.
+     * 
+     * See {@link Board} for available methods.
+     * 
+     * @return game board
+     */
+    Board getBoard();
 
-    @Override
-    public GameStatus getGameStatus() {
-        return status;
-    }
+    /**
+     * Drop a token for the current player, if possible,
+     * at the selected column.
+     * 
+     * The current player can be found with {@link getCurrentPlayer}.
+     * 
+     * If unable to make a move (ex. an invalid column was passed in),
+     * the current player remains the same.
+     * 
+     * If they successfully make a move, the board, game status,
+     * and current player is updated.
+     *
+     * @param column zero-indexed, the column (by default 0-6).
+     * @return SUCCESS if making the move was successful, COLUMN_FULL if the
+     *  column the user tried to drop a token down was already full,
+     *  or INVALID_COLUMN if the column supplied was invalid.
+     */
+    MoveResult dropToken(int column);
 
-    @Override
-    public Board getBoard() {
-        return board;
-    }
-
-    @Override
-    public boolean dropChecker(int column) {
-        if (status != GameStatus.IN_PROGRESS) {
-            return false;
-        }
-
-        int row = board.dropChecker(column, currentPlayer);
-        if (row == -1) {
-            return false;
-        }
-
-        if (checkWin(row, column)) {
-            status = (currentPlayer == Player.RED) ? GameStatus.RED_WIN : GameStatus.BLUE_WIN;
-        } else if (board.isBoardFull()) {
-            status = GameStatus.DRAW;
-        } else {
-            currentPlayer = currentPlayer.opposite();
-        }
-
-        return true;
-    }
-
-    @Override
-    public void reset() {
-        board.clear();
-        currentPlayer = Player.RED;
-        status = GameStatus.IN_PROGRESS;
-    }
-
-    private boolean checkWin(int row, int col) {
-        Player p = board.getCell(row, col);
-
-        return count(row, col, 1, 0, p) >= 4 ||   // vertical
-               count(row, col, 0, 1, p) >= 4 ||   // horizontal
-               count(row, col, 1, 1, p) >= 4 ||   // diagonal \
-               count(row, col, 1, -1, p) >= 4;    // diagonal /
-    }
-
-    private int count(int row, int col, int dRow, int dCol, Player p) {
-        return 1 + countWithDir(row, col, dRow, dCol, p) + countWithDir(row, col, -dRow, -dCol, p);
-    }
-
-    private int countWithDir(int row, int col, int dirRow, int dirCol, Player p) {
-        int r = row + dirRow;
-        int c = col + dirCol;
-        int count = 0;
-
-        while (r >= 0 && r < Board.ROWS && c >= 0 && c < Board.COLUMNS && board.getCell(r, c) == p) {
-            count++;
-            r += dirRow;
-            c += dirCol;
-        }
-        return count;
-    }
+    /**
+     * Reset the entire board from scratch.
+     * 
+     * Set the entire {@link Board} to be completely empty,
+     * for it to be the PLAYER_1 token's turn, and for the game
+     * to be started over.
+     */
+    void reset();
 }

@@ -3,7 +3,7 @@
  * 
  * In the game, a client may access the current player, 
  * game status, the board (readonly), and may 
- * drop a checker or reset the board.
+ * drop a token or reset the board.
  */
 public interface Game {
     /**
@@ -16,7 +16,7 @@ public interface Game {
     /**
      * Get the current game status.
      * 
-     * @return game status (in progress, red or blue win, or draw)
+     * @return game status (in progress, player 1 or 2 win, or draw)
      */
     GameStatus getGameStatus();
 
@@ -30,7 +30,7 @@ public interface Game {
     Board getBoard();
 
     /**
-     * Drop a checker with the selected player, if possible,
+     * Drop a token with the selected player, if possible,
      * at the selected column.
      * 
      * The current player can be found with {@link getCurrentPlayer}.
@@ -42,15 +42,16 @@ public interface Game {
      * and current player is updated.
      *
      * @param column zero-indexed, the column (by default 0-6).
-     * @return true if making the move was successful, false otherwise
+     * @return the status of dropping the token (e.g. if successfully dropped,
+     *  or some error code if not. See {@link MoveResult} for more information).
      */
-    boolean dropChecker(int column);
+    MoveResult dropToken(int column);
 
     /**
      * Reset the entire board from scratch.
      * 
      * Set the entire {@link Board} to be completely empty, 
-     * for it to be the red checker's turn, and for the game 
+     * for it to be the first player's turn, and for the game 
      * to be started over.
      */
     void reset();
